@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import productApi from "../../api/productApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
 import { AddShoppingCartIcon, ShoppingCartIcon } from "../../components/icon";
 import Pagination from "../../components/Pagination";
 import "./style.css";
+import cartApi from "../../api/cartApi";
 function Home() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage, setPostsPerPage] = useState(8);
@@ -14,7 +16,24 @@ function Home() {
     pageNo: 0,
     pageSize: 100,
   });
-
+  const iduser = JSON.parse(localStorage.getItem("userId"));
+  const handleAppToCart = (id) => {
+    cartApi
+      .addToCart(iduser, id)
+      .then((response) => {
+        console.log(response);
+        alert("Added Product To Cart successfully");
+      })
+      .catch((error) => console.log("fail add product to cart", error));
+  };
+  const handleBuyNow = (id) => {
+    cartApi
+      .addToCart(iduser, id)
+      .then((response) => {
+        navigate("/cart");
+      })
+      .catch((error) => console.log("fail add product to cart", error));
+  };
   const loadProducts = () => {
     productApi
       .getAllProduct({ params })
@@ -72,13 +91,21 @@ function Home() {
                   </div>
                 </Link>
                 <div className="product-btns">
-                  <button type="button" className="btn-cart">
+                  <button
+                    type="button"
+                    className="btn-cart"
+                    onClick={() => handleAppToCart(product.id)}
+                  >
                     add to cart
                     <span>
                       <AddShoppingCartIcon />
                     </span>
                   </button>
-                  <button type="button" className="btn-buy">
+                  <button
+                    type="button"
+                    className="btn-buy"
+                    onClick={() => handleBuyNow(product.id)}
+                  >
                     buy now
                     <span>
                       <ShoppingCartIcon />

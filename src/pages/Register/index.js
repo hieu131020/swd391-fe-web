@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import registerApi from "../../api/registerApi";
 import "./style.css";
@@ -9,7 +9,7 @@ function Register() {
   const [address, setaddress] = useState("");
   const [password, setPassword] = useState("");
   const [image, setImage] = useState();
-
+  const navigate = useNavigate();
   const handleRegister = () => {
     if (!fullName || !email || !password || !phone || !address) {
       alert("Please fill all the fields");
@@ -23,12 +23,34 @@ function Register() {
         image: image,
       };
       // console.log(payload);
-      registerApi.register(payload).then((response) => {
-        if (response === 400) console.log("loi ");
-        else {
-          alert("Register successfully");
-        }
-      });
+      registerApi
+        .register(payload)
+        .then((res) => {
+          alert(res.message);
+          navigate("/login");
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.response.data.validateMessage) {
+            // alert(err.response.data.validateMessage.newPassword);
+            if (
+              err.response.data.validateMessage.password &&
+              err.response.data.validateMessage.email
+            ) {
+              alert(
+                err.response.data.validateMessage.password,
+                "+",
+                err.response.data.validateMessage.email
+              );
+            } else if (err.response.data.validateMessage.password) {
+              alert(err.response.data.validateMessage.password);
+            } else if (err.response.data.validateMessage.email) {
+              alert(err.response.data.validateMessage.email);
+            } else alert(err.response.data.validateMessage.phone);
+          } else {
+            alert(err.response.data.message);
+          }
+        });
     }
   };
 
@@ -43,7 +65,7 @@ function Register() {
               </div>
             </div>
             {/* <form action="#" name="registration"> */}
-            <div className="form-group">
+            <div className="form-group was-validated">
               <label htmlFor="fullname">Full Name</label>
               <input
                 type="text"
@@ -54,9 +76,14 @@ function Register() {
                 placeholder="Enter FullName"
                 value={fullName}
                 onChange={(e) => setfullName(e.target.value)}
+                required
               />
+              <div className="valid-feedback">Valid.</div>
+              <div className="invalid-feedback">
+                Please fill out this field.
+              </div>
             </div>
-            <div className="form-group">
+            <div className="form-group was-validated">
               <label htmlFor="email">Email address</label>
               <input
                 type="text"
@@ -67,10 +94,15 @@ function Register() {
                 placeholder="Enter Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
+
+              <div className="invalid-feedback">
+                Please fill out this field.
+              </div>
             </div>
 
-            <div className="form-group">
+            <div className="form-group was-validated">
               <label htmlFor="phone">Phone Number</label>
               <input
                 type="text"
@@ -80,9 +112,14 @@ function Register() {
                 placeholder="Enter Phone"
                 value={phone}
                 onChange={(e) => setphone(e.target.value)}
+                required
               />
+
+              <div className="invalid-feedback">
+                Please fill out this field.
+              </div>
             </div>
-            <div className="form-group">
+            <div className="form-group was-validated">
               <label htmlFor="address">Address</label>
               <input
                 type="text"
@@ -92,9 +129,14 @@ function Register() {
                 placeholder="Enter Address"
                 value={address}
                 onChange={(e) => setaddress(e.target.value)}
+                required
               />
+              <div className="valid-feedback">Valid.</div>
+              <div className="invalid-feedback">
+                Please fill out this field.
+              </div>
             </div>
-            <div className="form-group">
+            <div className="form-group  was-validated">
               <label htmlFor="password">Password</label>
               <input
                 type="password"
@@ -105,9 +147,12 @@ function Register() {
                 placeholder="Enter Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
+              <div className="invalid-feedback">
+                Please fill out this field.
+              </div>
             </div>
-
             <div className="col-md-12 text-center mb-3">
               <button
                 type="submit"

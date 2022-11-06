@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import userApi from "../../api/userApi";
 import Header from "../../components/header/Header";
+import { UserAuth } from "../../context/AuthContext";
 import "./style.css";
 function ChangePass() {
   const [newPassword, setNewPassWord] = useState("");
   const [confirmPassWord, setConfirmPassWord] = useState();
-  const mail = "hieu131020@fpt.edu.vn";
+  const { user } = UserAuth();
+  const mail = user.email;
 
   const handleChangePass = () => {
     if (newPassword == null) {

@@ -1,8 +1,14 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import loginApi from "../../api/loginApi";
 import "./style.css";
+import GoogleButton from "react-google-button";
+import { UserAuth } from "../../context/AuthContext";
+
 function Login() {
+  const navigate = useNavigate();
+
+  const { googleSignIn, user, loginByAccount } = UserAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const handleLogin = () => {
@@ -10,13 +16,20 @@ function Login() {
       email: email,
       password: password,
     };
-    loginApi.login(payload).then((response) => {
-      console.log(response);
-      // if (response.body.status === 200) {
-      //   console.log(response);
-      // }
-    });
+    loginByAccount(payload);
   };
+  const handleGoogleSignIn = async () => {
+    try {
+      await googleSignIn();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (user != null) {
+      navigate("/");
+    }
+  }, [user]);
   return (
     <div className="login">
       <div className="row">
@@ -29,8 +42,8 @@ function Login() {
                 </div>
               </div>
               {/* <form action="" method="post" name="login"> */}
-              <div className="form-group">
-                <label htmlFor="exampleInputEmail1">Email address</label>
+              <div className="form-group was-validated">
+                <label htmlFor="email">Email address</label>
                 <input
                   type="email"
                   name="email"
@@ -40,10 +53,15 @@ function Login() {
                   placeholder="Enter email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
+                <div className="valid-feedback">Valid.</div>
+                <div className="invalid-feedback">
+                  Please fill out this field.
+                </div>
               </div>
-              <div className="form-group">
-                <label htmlFor="exampleInputEmail1">Password</label>
+              <div className="form-group was-validated">
+                <label htmlFor="password">Password</label>
                 <input
                   type="password"
                   name="password"
@@ -53,7 +71,12 @@ function Login() {
                   placeholder="Enter Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
+                <div className="valid-feedback">Valid.</div>
+                <div className="invalid-feedback">
+                  Please fill out this field.
+                </div>
               </div>
               {/* <div className="form-group">
                   <p className="text-center">
@@ -61,15 +84,15 @@ function Login() {
                   </p>
                 </div> */}
               <div className="col-md-12 text-center ">
-                <Link to="/">
-                  <button
-                    type="submit"
-                    className=" btn btn-block mybtn btn-primary tx-tfm"
-                    onClick={handleLogin}
-                  >
-                    Login
-                  </button>
-                </Link>
+                {/* <Link to="/"> */}
+                <button
+                  type="submit"
+                  className=" btn btn-block mybtn btn-primary tx-tfm"
+                  onClick={handleLogin}
+                >
+                  Login
+                </button>
+                {/* </Link> */}
               </div>
               <div className="col-md-12 ">
                 <div className="login-or">
@@ -78,11 +101,11 @@ function Login() {
                 </div>
               </div>
               <div className="col-md-12 mb-3">
-                <p className="text-center">
+                <div className="loginbygg">
                   {/* <a href="javascript:void();" className="google btn mybtn"> */}
-                  <i className="fa fa-google-plus"></i> Sign up using Google
+                  <GoogleButton onClick={handleGoogleSignIn} />
                   {/* </a> */}
-                </p>
+                </div>
               </div>
               <div className="form-group">
                 <p className="text-center">

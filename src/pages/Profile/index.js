@@ -6,6 +6,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import "./style.css";
 import userApi from "../../api/userApi";
+import { UserAuth } from "../../context/AuthContext";
 function Profile() {
   const imageDefault =
     "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg";
@@ -15,7 +16,8 @@ function Profile() {
   const [phone, setPhone] = useState();
   const [address, setAddress] = useState();
   const [imageUrl, setImageUrl] = useState("");
-  const mail = "hieu131020@fpt.edu.vn";
+  const { user } = UserAuth();
+  const mail = user.email;
   const loadUser = () => {
     userApi
       .getUser(mail)

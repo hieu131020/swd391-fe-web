@@ -1,5 +1,5 @@
 import "./header.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   AccountCircleIcon,
   BookIocn,
@@ -10,7 +10,9 @@ import {
   PianoIcon,
   SearchIcon,
 } from "../../components/icon/index";
-import { useState } from "react";
+import { useEffect } from "react";
+import { UserAuth } from "../../context/AuthContext";
+import { async } from "@firebase/util";
 const categorys = [
   {
     content: "",
@@ -35,14 +37,24 @@ const categorys = [
 ];
 // const search = "";
 const Header = ({ onPageChange }) => {
-  const mail = null;
-  const mail1 = "Sign in";
+  const navigate = useNavigate();
+
+  const { user, logOut } = UserAuth();
+  // const mail = null;
+  // const mail1 = "Sign in";
+  const handlSignOut = async () => {
+    try {
+      await logOut();
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   function handlePageChange(datasearch) {
     if (onPageChange) {
       onPageChange(datasearch);
     }
   }
-
   return (
     <div className="header">
       <div className="top_bar">
@@ -67,50 +79,63 @@ const Header = ({ onPageChange }) => {
                 </div>
                 <a href="mailto:fastsales@gmail.com">123123@fpt.edu.vn</a>
               </div>
-              <div className="top_bar_content ml-auto">
-                <div className="top_bar_menu">
-                  <ul className="standard_dropdown top_bar_dropdown">
-                    <li>
-                      <Link to="/login">
-                        <div className="user_icon">
-                          <img
-                            src="https://res.cloudinary.com/dxfq3iotg/image/upload/v1560918647/user.svg"
-                            alt=""
-                          />
-                        </div>
-                        {mail || mail1}
-                      </Link>
-                      <ul>
-                        <li>
-                          <Link to="/profile">Tài khoản của tôi</Link>
-                        </li>
-                        <li>
-                          <a href="#">Đăng xuất</a>
-                        </li>
-                        {/* <li>
-                          <a href="#">Japanese</a>
-                        </li> */}
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
-                <div className=" top_bar_user sm-10 ">
-                  {/* <div>
-                    <Link to="/login">Sign in</Link>
-                    <ul className="subnavSign">
+              {/* <div className="top_bar_content ml-auto"> */}
+              {/* <div className="top_bar_menu"> */}
+              {user?.email ? (
+                <ul className="standard_dropdown top_bar_dropdown">
+                  <li>
+                    <a>
+                      <div className="user_icon">
+                        <img
+                          src="https://res.cloudinary.com/dxfq3iotg/image/upload/v1560918647/user.svg"
+                          alt=""
+                        />
+                      </div>
+                      {user.email}
+                    </a>
+                    <ul>
                       <li>
-                        <a href="">Merchandise</a>
+                        <Link to="/profile">Tài khoản của tôi</Link>
                       </li>
                       <li>
-                        <a href="">Extras</a>
-                      </li>
-                      <li>
-                        <a href="">Media</a>
+                        <a onClick={handlSignOut} href="#">
+                          Đăng xuất
+                        </a>
                       </li>
                     </ul>
-                  </div> */}
-                </div>
-              </div>
+                  </li>
+                </ul>
+              ) : (
+                <ul className="standard_dropdown top_bar_dropdown">
+                  <li>
+                    <Link to="/login">Sign In </Link>
+                  </li>
+                </ul>
+              )}
+              {/* <ul className="standard_dropdown top_bar_dropdown">
+                <li>
+                  <Link to="/login">
+                    <div className="user_icon">
+                      <img
+                        src="https://res.cloudinary.com/dxfq3iotg/image/upload/v1560918647/user.svg"
+                        alt=""
+                      />
+                    </div>
+                    {mail || mail1}
+                  </Link>
+                  <ul>
+                    <li>
+                      <Link to="/profile">Tài khoản của tôi</Link>
+                    </li>
+                    <li>
+                      <a href="#">Đăng xuất</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul> */}
+              {/* </div> */}
+              {/* <div className=" top_bar_user sm-10 "></div> */}
+              {/* </div> */}
             </div>
           </div>
         </div>
@@ -175,7 +200,7 @@ const Header = ({ onPageChange }) => {
                     </div>
                     <div className="cart_content">
                       <div className="cart_text">
-                        <a href="#">Cart</a>
+                        <Link to="/cart">Cart</Link>
                       </div>
                     </div>
                   </div>
